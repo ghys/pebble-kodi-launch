@@ -82,8 +82,8 @@
 
     // Save for next launch
     localStorage['kodi_ip'] = options['kodi_ip'];
-    localStorage['kodi_user'] = username.value;
-    localStorage['kodi_password'] = password.value;
+    if (username.value) localStorage['kodi_user'] = username.value;
+    if (password.value) localStorage['kodi_password'] = password.value;
 
     //console.log('Got options: ' + JSON.stringify(options));
     return options;
