@@ -13,6 +13,9 @@
 #define VAL_NAV_DOWN     4
 #define VAL_NAV_SELECT   5
 #define VAL_NAV_BACK     6
+#define VAL_NAV_CONTEXT  7
+#define VAL_NAV_OSD      8
+#define VAL_NAV_CODEC    9
 
 
 static Window *s_main_window = NULL;
@@ -24,7 +27,7 @@ static TextLayer *s_label_layer = NULL;
 //static GBitmap *s_mute_bitmap, *s_down_bitmap, *s_up_bitmap;
 
 static void send_keypress(uint8_t key) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Send keypress %d", key);
+  //APP_LOG(APP_LOG_LEVEL_INFO, "Send keypress %d", key);
   DictionaryIterator *iter; 
   uint8_t value = key; 
   app_message_outbox_begin(&iter); 
@@ -50,6 +53,15 @@ static void keypress_select() {
 static void keypress_back() {
     send_keypress(VAL_NAV_BACK);
 }
+static void keypress_context() {
+    send_keypress(VAL_NAV_CONTEXT);
+}
+static void keypress_osd() {
+    send_keypress(VAL_NAV_OSD);
+}
+static void keypress_codec() {
+    send_keypress(VAL_NAV_CODEC);
+}
 
 void navigation_click_config_provider(void *context) {
     window_single_click_subscribe(BUTTON_ID_DOWN, keypress_down);
@@ -60,6 +72,9 @@ void navigation_click_config_provider(void *context) {
     //window_long_click_subscribe(BUTTON_ID_BACK, 0, keypress_back, NULL);
     window_multi_click_subscribe(BUTTON_ID_SELECT, 2, 0, 0, false, keypress_select);
     window_multi_click_subscribe(BUTTON_ID_BACK, 2, 0, 0, false, keypress_back);
+    window_multi_click_subscribe(BUTTON_ID_UP, 2, 0, 0, false, keypress_osd);
+    //window_multi_click_subscribe(BUTTON_ID_UP, 4, 0, 0, false, keypress_codec);
+    window_multi_click_subscribe(BUTTON_ID_DOWN, 2, 0, 0, false, keypress_context);
     //window_multi_click_subscribe(BUTTON_ID_BACK, 4, 0, 0, false, keypress_select);
 //  window_long_click_subscribe(BUTTON_ID_DOWN, 0, volume_down_long, NULL);
 //  window_long_click_subscribe(BUTTON_ID_UP, 0, volume_up_long, NULL);
@@ -68,7 +83,7 @@ void navigation_click_config_provider(void *context) {
 static void window_load(Window *window) {
     Layer *window_layer = window_get_root_layer(window);
     GRect bounds = layer_get_bounds(window_layer);
-    APP_LOG(APP_LOG_LEVEL_INFO, "window load");
+    //APP_LOG(APP_LOG_LEVEL_INFO, "window load");
 
     //s_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CONFIRM);
 

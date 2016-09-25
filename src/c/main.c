@@ -1,13 +1,12 @@
 #include <pebble.h>
 
-#include "dsp.h"
-#include "input.h"
 #include "movies.h"
 #include "navigation.h"
 #include "volume.h"
 #include "playback.h"
 #include "tvshows.h"
 #include "livetv.h"
+#include "system.h"
 
 #define KEY_ERROR     0
 #define KEY_DATA_REQUEST  1
@@ -38,10 +37,11 @@ static MenuLayer *s_menu_layer;
 static GBitmap *s_volume_icon;
 static GBitmap *s_volumemuted_icon;
 static GBitmap *s_power_icon;
-static GBitmap *s_scene_icon;
-static GBitmap *s_song_icon;
-static GBitmap *s_input_icon;
-static GBitmap *s_dsp_icon;
+static GBitmap *s_live_icon;
+static GBitmap *s_tv_icon;
+static GBitmap *s_movie_icon;
+static GBitmap *s_navigation_icon;
+static GBitmap *s_note_icon;
 
 static Tuple *s_error;
 static Tuple *s_volume;
@@ -86,20 +86,23 @@ static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex 
       menu_cell_basic_draw(ctx, cell_layer, s_volume_text_label, NULL, s_volume_icon);
       break;
     case 2:
-      menu_cell_basic_draw(ctx, cell_layer, "Navigation", NULL, s_dsp_icon);
+      menu_cell_basic_draw(ctx, cell_layer, "Navigation", NULL, s_navigation_icon);
       break;
     case 3:
-      menu_cell_basic_draw(ctx, cell_layer, "TV shows", NULL, s_power_icon);
+      menu_cell_basic_draw(ctx, cell_layer, "TV shows", NULL, s_tv_icon);
       break;
     case 4:
-      menu_cell_basic_draw(ctx, cell_layer, "Movies", NULL, s_volume_icon);
+      menu_cell_basic_draw(ctx, cell_layer, "Movies", NULL, s_movie_icon);
       break;
     case 5:
-      menu_cell_basic_draw(ctx, cell_layer, "Live TV", NULL, s_input_icon);
+      menu_cell_basic_draw(ctx, cell_layer, "Live TV", NULL, s_live_icon);
       break;
     case 6:
-      menu_cell_basic_draw(ctx, cell_layer, "Music", NULL, s_dsp_icon);
+      menu_cell_basic_draw(ctx, cell_layer, "System", NULL, s_power_icon);
       break;
+    //case 6:
+    //  menu_cell_basic_draw(ctx, cell_layer, "Music", NULL, s_dsp_icon);
+    //  break;
     default:
       break;
   }
@@ -142,28 +145,13 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     case 5:
     {
         init_livetv_action_menu();
+        break;
     }
-/*
-case 4:
+    case 6:
     {
-      init_dsp_program_action_menu();
-      break;
+        init_system_action_menu();
+        break;
     }
-    case 2:
-    {
-      DictionaryIterator *iter; 
-      uint8_t value = 2; 
-      app_message_outbox_begin(&iter); 
-      dict_write_int(iter, KEY_DATA_REQUEST, &value, 1, true); 
-      dict_write_end(iter); 
-      app_message_outbox_send(); 
-      break;
-    }
-    case 3:
-    {
-      init_dsp_program_action_menu();
-      break;
-    } */
     default:
       break;
   }
@@ -176,10 +164,11 @@ static void menu_load(Window *window) {
   s_power_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_POWER);
   s_volume_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_VOLUME);
   s_volumemuted_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_VOLUMEMUTED);
-  s_scene_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_SCENE);
-  s_song_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_SONG);
-  s_input_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_INPUT);
-  s_dsp_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_DSP);
+  s_live_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_MIC);
+  s_movie_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_MOVIE);
+  s_tv_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_TV);
+  s_navigation_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_NAVIGATION);
+  s_note_icon = gbitmap_create_with_resource(RESOURCE_ID_ICON_NOTE);
 
   s_menu_layer = menu_layer_create(bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
@@ -204,10 +193,11 @@ static void menu_unload(Window *window) {
   gbitmap_destroy(s_power_icon);
   gbitmap_destroy(s_volume_icon);
   gbitmap_destroy(s_volumemuted_icon);
-  gbitmap_destroy(s_scene_icon);
-  gbitmap_destroy(s_song_icon);
-  gbitmap_destroy(s_input_icon);
-  gbitmap_destroy(s_dsp_icon);
+  gbitmap_destroy(s_live_icon);
+  gbitmap_destroy(s_movie_icon);
+  gbitmap_destroy(s_tv_icon);
+  gbitmap_destroy(s_navigation_icon);
+  gbitmap_destroy(s_note_icon);
 }
 
 
@@ -306,9 +296,15 @@ static void init() {
     .unload = window_unload,
   });
 
+#ifdef PBL_PLATFORM_APLITE
+  int inbox_size = 3000;
+#else
+  int inbox_size = app_message_inbox_size_maximum(); // - 2800;
+#endif
+  APP_LOG(APP_LOG_LEVEL_INFO, "opening inbox with size=%d", inbox_size);
+  app_message_open(inbox_size, 100);
   app_message_register_inbox_received(inbox_received_handler);
   app_message_register_inbox_dropped(inbox_error_handler);
-  app_message_open(app_message_inbox_size_maximum(), 100);
 
   
   window_stack_push(s_main_window, true);

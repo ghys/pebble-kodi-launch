@@ -83,11 +83,11 @@ static void stop() {
 }
 
 void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_DOWN, goto_next);
-  window_single_click_subscribe(BUTTON_ID_UP, goto_prev);
+  window_single_click_subscribe(BUTTON_ID_DOWN, skip_rev);
+  window_single_click_subscribe(BUTTON_ID_UP, skip_fwd);
   window_single_click_subscribe(BUTTON_ID_SELECT, play_pause);
-  window_long_click_subscribe(BUTTON_ID_UP, 0, skip_rev, NULL);
-  window_long_click_subscribe(BUTTON_ID_DOWN, 0, skip_fwd, NULL);
+  window_long_click_subscribe(BUTTON_ID_UP, 0, goto_prev, NULL);
+  window_long_click_subscribe(BUTTON_ID_DOWN, 0, goto_next, NULL);
   window_long_click_subscribe(BUTTON_ID_SELECT, 0, stop, NULL);
 }
 
@@ -97,7 +97,7 @@ static void window_load(Window *window) {
 
   //s_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CONFIRM);
 
-  const GEdgeInsets title_insets = {.top = 3, .right = 28, .bottom = 21, .left = 14};
+  const GEdgeInsets title_insets = {.top = 3, .right = ACTION_BAR_WIDTH, .bottom = 21, .left = ACTION_BAR_WIDTH / 4};
   //s_icon_layer = bitmap_layer_create(grect_inset(bounds, icon_insets));
   //bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
   //bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);

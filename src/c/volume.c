@@ -10,7 +10,7 @@ static ActionBarLayer *s_action_bar_layer;
 static GBitmap *s_mute_bitmap, *s_down_bitmap, *s_up_bitmap;
 
 void volume_window_refresh(char *value, char *mute) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Refreshing volume: val=%s mute=%s", value, mute);
+  //APP_LOG(APP_LOG_LEVEL_INFO, "Refreshing volume: val=%s mute=%s", value, mute);
 
   if (!s_main_window || !s_label_layer) {
     return;

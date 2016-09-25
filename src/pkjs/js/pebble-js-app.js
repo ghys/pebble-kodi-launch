@@ -1,7 +1,8 @@
 var options = JSON.parse(localStorage.getItem('options'));
+var refresh_timeout;
 
 Pebble.addEventListener('showConfiguration', function() {
-  var url = 'https://rawgit.com/ghys/pebble-yamaha-remote/master/config/index.html';
+  var url = 'https://rawgit.com/ghys/pebble-kodi-launch/master/config/config.html';
   console.log('Showing configuration page: ' + url);
 
   Pebble.openURL(url);
@@ -27,8 +28,8 @@ function sendRequest(method, params, callback) {
         params: params
     };
     
-    req.open('POST', "http://" + options.yamaha_ip + "/jsonrpc");
-    req.setRequestHeader("Authorization", "Basic eGJtYzp4Ym1j"); 
+    req.open('POST', "http://" + options.kodi_ip + "/jsonrpc");
+    if (options.kodi_auth) req.setRequestHeader("Authorization", "Basic " + options.kodi_auth); 
     req.setRequestHeader("Content-type", "application/json"); 
     req.send(JSON.stringify(payload));
 }
@@ -43,21 +44,42 @@ var send = function (dict) {
   });
 }; 
 
-var sendCurrentStatus = function(data, data2, data3) {
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
+var sendCurrentStatus = function(data, data2, data3, data4) {
     var dict = {};
-    dict["VOLUME"] = data.result.volume.toString();
-    dict["MUTE"] = (data.result.muted) ? "Mute" : "";
-    dict["PLAYBACK_MAIN"] = (data3.result.item.type === "episode") ? data3.result.item.showtitle
+    dict.volume= data.result.volume.toString();
+    dict.mute = (data.result.muted) ? "Mute" : "";
+    dict.playback_main = (data3.result.item.type === "episode") ? data3.result.item.showtitle
     : data3.result.item.label;
-    dict["PLAYBACK_SUB"] = (data3.result.item.type === "episode") ? data3.result.item.season.toString() +
+    dict.playback_sub = (data3.result.item.type === "episode") ? data3.result.item.season.toString() +
         'x' + data3.result.item.episode.toString() + ' ' + data3.result.item.title
     : (data3.result.item.type === "song") ? data3.result.item.artist[0]
     : (data3.result.item.type === "channel") ? data3.result.item.title : "";
-    dict["PLAYBACK_STATUS"] = "Stopped";
-    dict["PLAYBACK_ELAPSED"] = "0:00";
-    dict["INPUT_TITLE"] = data3.result.item.type;
+    if (data4.result) {
+        dict.playback_status = "Playing";
+        dict.playback_elapsed = ((data4.result.time.hours) ? data4.result.time.hours + ":" : "") +
+            pad(data4.result.time.minutes, 2) + ":" + pad(data4.result.time.seconds, 2);
+        if (data4.result.totaltime.minutes || data4.result.totaltime.seconds)
+            dict.playback_elapsed += " / " + ((data4.result.totaltime.hours) ? data4.result.totaltime.hours + ":" : "") +
+                pad(data4.result.totaltime.minutes, 2) + ":" + pad(data4.result.totaltime.seconds, 2);
 
-    //console.log(JSON.stringify(dict));
+            
+        dict.input_title = (data3.result.item.type === "episode") ? "TV Show" :
+                           (data3.result.item.type === "channel") ? "Live TV" :
+                           (data3.result.item.type === "song") ? "Music" :
+                           (data3.result.item.type === "movie") ? "Movie" :
+                            data3.result.item.type;
+    } else {
+        dict.playback_status = "Stopped";
+        dict.playback_elapsed = "";
+        dict.input_title = "";
+    }
+
     send(dict);    
 };
 
@@ -73,13 +95,22 @@ var getBasicInfo = function() {
                         "properties": ["title", "album", "artist", "track", "season", "episode", "showtitle"]
                     }, function (err3, data3) {
                         if (data3) {
-                            sendCurrentStatus(data, data2, data3);
+                            sendRequest("Player.GetProperties", {
+                                "playerid": data2.result[0].playerid,
+                                "properties": ["live", "time", "totaltime"]
+                            }, function (err4, data4) {
+                                if (data4) {
+                                    sendCurrentStatus(data, data2, data3, data4);
+                                } else {                                    
+                                    send({ERROR: "Player.GetProperties Error " + err4});
+                                }
+                            });
                         } else {
-                            send({ERROR: "Player.GetItem Error " + err});
+                            send({ERROR: "Player.GetItem Error " + err3});
                         }
                     });
                 } else {
-                    sendCurrentStatus(data, data2, {result: { item: {label: "Nothing playing", type: "N/A"}}});
+                    sendCurrentStatus(data, data2, {result: { item: {label: "Nothing playing", type: "N/A"}}}, {});
                 }
             });
         }
@@ -328,6 +359,14 @@ var playMovie = function(movieid) {
     });
 };
 
+var playChannel = function(channelid) {
+    console.log("Playing channelid: " + channelid);
+    sendRequest("Player.Open", {
+        "item": { "channelid": channelid }
+    }, function (data, err) {
+    });
+};
+
 
 var sendKeypress = function(key) {
     sendRequest("Input." + key, {}, function (err, data) {
@@ -353,10 +392,31 @@ var sendToCurrentPlayer = function(method, params) {
     });
 };
 
+var setVolume = function(incdec) {
+    sendRequest("Application.SetVolume", {
+        "volume": incdec
+    }, function (err, data) {
+    });
+};
+
+var toggleMute = function() {
+    sendRequest("Application.SetMute", {
+        "mute": "toggle"
+    }, function (err, data) {
+    });
+};
+
 
 Pebble.addEventListener("appmessage", function(e) {
-    console.log("message received: " + JSON.stringify(e.payload));
+    //console.log("message received: " + JSON.stringify(e.payload));
     if (e.payload.data_request) {
+        if (e.payload.data_request === "getbasicinfo") {
+            refresh_timeout = setInterval(getBasicInfo, 3000);
+            getBasicInfo();
+        } else {
+            clearTimeout(refresh_timeout);            
+        }
+        
         switch (e.payload.data_request) {
             case "recentepisodes":
                 getRecentEpisodes();
@@ -417,11 +477,25 @@ Pebble.addEventListener("appmessage", function(e) {
             case "6":
                 sendKeypress("Back");
                 break;
+            case "7":
+                sendKeypress("ContextMenu");
+                break;
+            case "8":
+                sendKeypress("ShowOSD");
+                break;
+            case "9":
+                sendKeypress("ShowCodec");
+                break;
+            case "10":
+                sendKeypress("Info");
+                break;
         }
     } else if (e.payload.play_episode) {
         playEpisode(e.payload.play_episode);
     } else if (e.payload.play_movie) {
         playMovie(e.payload.play_movie);
+    } else if (e.payload.play_channel) {
+        playChannel(e.payload.play_channel);
     } else if (e.payload.play_pause) {
         sendToCurrentPlayer("Player.PlayPause", {play: "toggle"});
     } else if (e.payload.stop) {
@@ -434,41 +508,40 @@ Pebble.addEventListener("appmessage", function(e) {
         sendToCurrentPlayer("Player.GoTo", {to: "previous"});
     } else if (e.payload.goto_next) {
         sendToCurrentPlayer("Player.GoTo", {to: "next"});
+    } else if (e.payload.volume_down) {
+        setVolume("decrement");
+    } else if (e.payload.volume_up) {
+        setVolume("increment");
+    } else if (e.payload.mute_toggle) {
+        toggleMute();
+    } else if (e.payload.system_action) {
+        switch (e.payload.system_action) {
+            case "togglefullscreen":
+                sendRequest("GUI.SetFullscreen", { "fullscreen": "toggle" });
+                break;
+            case "togglepartymode":
+                sendToCurrentPlayer("Player.SetPartymode", { "partymode": "toggle" });
+                break;
+            case "libraryscan":
+                sendRequest("VideoLibrary.Scan");
+                break;
+            case "toggleinfo":
+                sendKeypress("Info");
+                break;
+            case "togglecodec":
+                sendKeypress("ShowCodec");
+                break;
+            case "suspend":
+                sendRequest("System.Suspend");
+                break;
+            case "reboot":
+                sendRequest("System.Reboot");
+                break;
+            case "shutdown":
+                sendRequest("System.Shutdown");
+                break;
+        }
     }
-    
-    
-/*  if (e.payload['DATA_REQUEST']) {
-    if (e.payload['DATA_REQUEST'] == 1)
-      getBasicMainZoneInfo();
-    else if (e.payload['DATA_REQUEST'] == 2)
-      getScenes();
-  } else if (e.payload['POWER_TOGGLE']) {
-    powerToggle();
-  } else if (e.payload['VOLUME_UP']) {
-    setVolume('Up');
-  } else if (e.payload['VOLUME_DOWN']) {
-    setVolume('Down');
-  } else if (e.payload['VOLUME_UP_LONG']) {
-    setVolume('Up 5 dB');
-  } else if (e.payload['VOLUME_DOWN_LONG']) {
-    setVolume('Down 5 dB');
-  } else if (e.payload['MUTE_TOGGLE']) {
-    muteToggle();
-  } else if (e.payload['SET_SCENE']) {
-    setScene(e.payload['SET_SCENE']);
-  } else if (e.payload['SWITCH_INPUT']) {
-    switchInput(e.payload['SWITCH_INPUT']);
-  } else if (e.payload['SET_DSP_PROGRAM']) {
-    setDSPProgram(e.payload['SET_DSP_PROGRAM']);
-  } else if (e.payload['SKIP_REV']) {
-    playbackControl('Skip Rev');
-  } else if (e.payload['SKIP_FWD']) {
-    playbackControl('Skip Fwd');
-  } else if (e.payload['PAUSE']) {
-    playbackControl('Pause');
-  } else if (e.payload['PLAY']) {
-    playbackControl('Play');
-  }*/
 });
 
 
@@ -478,25 +551,7 @@ Pebble.addEventListener('webviewclosed', function(e) {
     localStorage.setItem('options', JSON.stringify(options)); 
 
     getBasicInfo();
-    
-    /*var dict = {};
-    dict['YAMAHA_IP'] = options['yamaha_ip'] ? options['yamaha_ip'] : "";
-    
-    sendRequest("GET", "<System><Config>GetParam</Config></System>", function (err, data) {
-      if (data) {
-        //dict['BASIC_CONFIG'] = data.substring(data.indexOf("<Model_Name>"), data.indexOf("<Feature_Existence>"));
-        dict['BASIC_CONFIG'] = basicNodeValue(data, "Model_Name");
-        
-        // Send to watchapp
-        Pebble.sendAppMessage(dict, function() {
-          console.log('Send successful: ' + JSON.stringify(dict));
-        }, function() {
-          console.log('Send failed!');
-        });
-      }
-    })*/
   }
-  
 });
 
 
@@ -504,11 +559,11 @@ Pebble.addEventListener('ready', function() {
   console.log('PebbleKit JS ready!');
   console.log('options:' + JSON.stringify(options));
   
-  if (!options || !options['yamaha_ip']) {
+  if (!options || !options.kodi_ip) {
     send({'ERROR': 'Please set up\nIP address\nin app settings'});
   }
   
-  //setInterval(getBasicInfo, 3000);
+  refresh_timeout = setInterval(getBasicInfo, 3000);
   getBasicInfo();
   
 });

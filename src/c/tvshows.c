@@ -100,7 +100,7 @@ static void play_episode(int index, void *context) {
 static void episodes_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "episodes app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "episodes app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -110,7 +110,7 @@ static void episodes_list_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_episodes_menu_items = calloc(nb_items, sizeof(SimpleMenuItem));
     s_episodes_titles = calloc(nb_items, MENUITEM_BUFFER_SIZE);
@@ -217,7 +217,7 @@ static char *s_seasons_subtitles;
 static void seasons_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "seasons app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "seasons app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -227,7 +227,7 @@ static void seasons_list_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_seasons_menu_items = calloc(nb_items, sizeof(SimpleMenuItem));
     s_seasons_titles = calloc(nb_items, MENUITEM_BUFFER_SIZE);
@@ -333,7 +333,7 @@ static char *s_shows_subtitles;
 static void tvshows_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "tv shows app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "tv shows app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -343,7 +343,7 @@ static void tvshows_list_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_shows_menu_items = calloc(nb_items, sizeof(SimpleMenuItem));
     s_shows_titles = calloc(nb_items, MENUITEM_BUFFER_SIZE);
@@ -354,7 +354,7 @@ static void tvshows_list_received(DictionaryIterator *iter, void *context) {
         Tuple *subtitle_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 2);
         Tuple *id_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 0);
         s_tvshowids[i] = id_tuple->value->uint32;
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s subtitle=%s", title_tuple->value->cstring, subtitle_tuple->value->cstring);
+        //APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s subtitle=%s", title_tuple->value->cstring, subtitle_tuple->value->cstring);
         
         snprintf(s_shows_titles + i*MENUITEM_BUFFER_SIZE, MENUITEM_BUFFER_SIZE, "%s", title_tuple->value->cstring);
         snprintf(s_shows_subtitles + i*MENUITEM_BUFFER_SIZE, MENUITEM_BUFFER_SIZE, "%s", subtitle_tuple->value->cstring);
@@ -410,8 +410,15 @@ static void tvshows_window_unload(Window *window) {
     free(s_shows_menu_items);
     window_destroy(s_shows_window);
     s_shows_window = NULL;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
+    
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
     app_message_register_inbox_received(s_main_msg_callback);
+    
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+	dict_write_cstring(iter, KEY_DATA_REQUEST, "getbasicinfo");
+	dict_write_end(iter);
+	app_message_outbox_send();
 }
 
 static void show_all_shows(ActionMenu *action_menu, const ActionMenuItem *action, void *context) {
@@ -448,7 +455,7 @@ static SimpleMenuLayer *s_recent_menu_layer;
 static void recent_episodes_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "recent episodes app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "recent episodes app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -458,7 +465,7 @@ static void recent_episodes_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_recent_menu_items = calloc(nb_items, sizeof(SimpleMenuItem));
     s_episodes_menu_items = calloc(nb_items, sizeof(SimpleMenuItem));
@@ -526,8 +533,14 @@ static void recent_window_unload(Window *window) {
     free(s_shows_menu_items);
     window_destroy(s_recent_window);
     s_recent_window = NULL;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
     app_message_register_inbox_received(s_main_msg_callback);
+
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+	dict_write_cstring(iter, KEY_DATA_REQUEST, "getbasicinfo");
+	dict_write_end(iter);
+	app_message_outbox_send();
 }
 
 static void show_recently_added(ActionMenu *action_menu, const ActionMenuItem *action, void *context) {

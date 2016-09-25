@@ -76,7 +76,7 @@ static void play_movie(int index, void *context) {
 static void movies_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "movies app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "movies app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -86,7 +86,7 @@ static void movies_list_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_movies_menu_items = malloc(nb_items * sizeof(SimpleMenuItem));
 
@@ -95,7 +95,7 @@ static void movies_list_received(DictionaryIterator *iter, void *context) {
         Tuple *subtitle_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 2);
         Tuple *id_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 0);
         s_movieids[i] = id_tuple->value->uint32;
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s subtitle=%s", title_tuple->value->cstring, subtitle_tuple->value->cstring);
+        //APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s subtitle=%s", title_tuple->value->cstring, subtitle_tuple->value->cstring);
         s_movies_menu_items[i].title = title_tuple->value->cstring;
         s_movies_menu_items[i].subtitle = subtitle_tuple->value->cstring;
         s_movies_menu_items[i].icon = NULL;
@@ -145,8 +145,15 @@ static void movies_window_unload(Window *window) {
     simple_menu_layer_destroy(s_movies_menu_layer);
     window_destroy(s_movies_window);
     s_movies_window = NULL;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
+    
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
     app_message_register_inbox_received(s_main_msg_callback);
+  
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+	dict_write_cstring(iter, KEY_DATA_REQUEST, "getbasicinfo");
+	dict_write_end(iter);
+	app_message_outbox_send();
 }
 
 static void show_all_movies(ActionMenu *action_menu, const ActionMenuItem *action, void *context) {

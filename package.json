@@ -10,112 +10,76 @@
         "displayName": "Kodi Launch",
         "enableMultiJS": false,
         "messageKeys": {
-            "DSP_PROGRAM": 7,
             "ERROR": 0,
-            "INPUT_COUNT": 200,
-            "INPUT_NAME": 6,
-            "INPUT_TITLE": 5,
-            "MUTE": 4,
-            "MUTE_TOGGLE": 13,
-            "PLAYBACK_ELAPSED": 10,
-            "PLAYBACK_MAIN": 8,
-            "PLAYBACK_STATUS": 14,
-            "PLAYBACK_SUB": 9,
-            "SET_DSP_PROGRAM": 399,
-            "SET_SCENE": 199,
-            "SWITCH_INPUT": 299,
-            "VOLUME": 3,
-            "VOLUME_DOWN": 12,
-            "VOLUME_DOWN_LONG": 22,
-            "VOLUME_UP": 11,
-            "VOLUME_UP_LONG": 21,
             "data_request": 1,
             "data_request_id": 100,
             "data_request_id2": 101,
+            "dsp_program": 7,
             "goto_next": 905,
             "goto_previous": 904,
+            "input_name": 6,
+            "input_title": 5,
+            "mute": 4,
+            "mute_toggle": 13,
             "nav_keypress": 30,
             "nb_items": 9999,
             "play_channel": 1002,
             "play_episode": 1000,
             "play_movie": 1001,
             "play_pause": 902,
+            "playback_elapsed": 10,
+            "playback_main": 8,
+            "playback_status": 14,
+            "playback_sub": 9,
             "skip_fwd": 901,
             "skip_rev": 900,
-            "stop": 903
+            "stop": 903,
+            "system_action": 200,
+            "volume": 3,
+            "volume_down": 12,
+            "volume_down_long": 22,
+            "volume_up": 11,
+            "volume_up_long": 21
         },
         "projectType": "native",
         "resources": {
             "media": [
                 {
-                    "file": "images/Album.png",
-                    "name": "ICON_SONG",
-                    "targetPlatforms": null,
+                    "file": "images/navigation.png",
+                    "name": "ICON_NAVIGATION",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
                     "type": "bitmap"
                 },
                 {
-                    "file": "images/Microphone.png",
-                    "name": "ICON_INPUT",
-                    "targetPlatforms": null,
+                    "file": "images/movie.png",
+                    "name": "ICON_MOVIE",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
                     "type": "bitmap"
                 },
                 {
-                    "file": "images/Note.png",
-                    "name": "ICON_DSP",
-                    "targetPlatforms": null,
+                    "file": "images/tv.png",
+                    "name": "ICON_TV",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
                     "type": "bitmap"
                 },
                 {
-                    "file": "images/Photo.png",
-                    "name": "ICON_SCENE",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/Power.png",
-                    "name": "ICON_POWER",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/Volume-Off.png",
-                    "name": "ICON_VOLUMEMUTED",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/Volume-On.png",
-                    "name": "ICON_VOLUME",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/pause.png",
-                    "name": "ICON_PAUSE",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/play.png",
-                    "name": "ICON_PLAY",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/skip-fwd.png",
-                    "name": "ICON_SKIP_FWD",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/skip-rev.png",
-                    "name": "ICON_SKIP_REV",
-                    "targetPlatforms": null,
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/volume-down.png",
-                    "name": "ICON_VOLUME_DOWN",
+                    "file": "images/volume-up.png",
+                    "name": "ICON_VOLUME_UP",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 },
@@ -126,8 +90,62 @@
                     "type": "bitmap"
                 },
                 {
-                    "file": "images/volume-up.png",
-                    "name": "ICON_VOLUME_UP",
+                    "file": "images/volume-down.png",
+                    "name": "ICON_VOLUME_DOWN",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/skip-rev.png",
+                    "name": "ICON_SKIP_REV",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/skip-fwd.png",
+                    "name": "ICON_SKIP_FWD",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/play.png",
+                    "name": "ICON_PLAY",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/pause.png",
+                    "name": "ICON_PAUSE",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/Volume-On.png",
+                    "name": "ICON_VOLUME",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/Volume-Off.png",
+                    "name": "ICON_VOLUMEMUTED",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/Power.png",
+                    "name": "ICON_POWER",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/Note.png",
+                    "name": "ICON_NOTE",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/Microphone.png",
+                    "name": "ICON_MIC",
                     "targetPlatforms": null,
                     "type": "bitmap"
                 }
@@ -137,9 +155,10 @@
         "targetPlatforms": [
             "aplite",
             "basalt",
-            "chalk"
+            "chalk",
+            "diorite"
         ],
-        "uuid": "1cca19a7-c23d-4fb0-9043-8e3a9d3d9c4f",
+        "uuid": "1e62831c-d96c-4859-bce8-31fa16ce764f",
         "watchapp": {
             "watchface": false
         }

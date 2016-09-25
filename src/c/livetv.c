@@ -26,7 +26,7 @@ static uint32_t s_channelgroupids[32];
 static uint32_t s_channelids[32];
 
 static char *s_channelgroups_titles;
-static char *s_channels_titles;
+//static char *s_channels_titles;
 
 
 static char s_appglance[256];
@@ -76,15 +76,16 @@ static void play_channel(int index, void *context) {
 	app_message_outbox_send();
     
     // then pop all & exit
-    exit_reason_set(APP_EXIT_ACTION_PERFORMED_SUCCESSFULLY);
-    window_stack_pop_all(true);
+    // ...or not - keep the screen on for quick switching
+    //exit_reason_set(APP_EXIT_ACTION_PERFORMED_SUCCESSFULLY);
+    //window_stack_pop_all(true);
 }
 
 
 static void channels_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "channels app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "channels app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     if (!nb_items_tuple || nb_items_tuple->value->int32 < 1) {
@@ -94,7 +95,7 @@ static void channels_list_received(DictionaryIterator *iter, void *context) {
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_channels_menu_items = malloc(nb_items * sizeof(SimpleMenuItem));
 
@@ -103,7 +104,7 @@ static void channels_list_received(DictionaryIterator *iter, void *context) {
         //Tuple *subtitle_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 2);
         Tuple *id_tuple = dict_find(iter, KEY_FIRST_ITEM + (i * ITEM_SIZE) + 0);
         s_channelids[i] = id_tuple->value->uint32;
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s", title_tuple->value->cstring);
+        //APP_LOG(APP_LOG_LEVEL_DEBUG, "title=%s", title_tuple->value->cstring);
         s_channels_menu_items[i].title = title_tuple->value->cstring;
         s_channels_menu_items[i].subtitle = NULL; // subtitle_tuple->value->cstring;
         s_channels_menu_items[i].icon = NULL;
@@ -117,7 +118,7 @@ static void channels_list_received(DictionaryIterator *iter, void *context) {
     Layer *window_layer = window_get_root_layer(s_channels_window);
 	GRect bounds = layer_get_bounds(window_layer);
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "creating channels menu");
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "creating channels menu");
 
     s_channels_menu_layer = simple_menu_layer_create(bounds, s_channels_window, &s_channels_menu_section, 1, NULL);
 #ifdef PBL_COLOR
@@ -158,6 +159,12 @@ static void channels_window_unload(Window *window) {
     s_channels_window = NULL;
     APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
     app_message_register_inbox_received(s_main_msg_callback);
+    
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+	dict_write_cstring(iter, KEY_DATA_REQUEST, "getbasicinfo");
+	dict_write_end(iter);
+	app_message_outbox_send();
 }
 
 static void show_channels(ActionMenu *action_menu, const ActionMenuItem *action, void *context) {
@@ -185,7 +192,7 @@ ACTION MENU
 static void channelgroups_list_received(DictionaryIterator *iter, void *context) {
     s_error = dict_find(iter, KEY_ERROR);
     
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "channel groups app message callback");
+	//APP_LOG(APP_LOG_LEVEL_DEBUG, "channel groups app message callback");
   
  	Tuple *nb_items_tuple = dict_find(iter, KEY_NB_MENU_ITEMS);
     
@@ -195,7 +202,7 @@ static void channelgroups_list_received(DictionaryIterator *iter, void *context)
     }
 
     int nb_items = nb_items_tuple->value->int32;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "size=%d", nb_items);
 
     s_channelgroups_titles = calloc(nb_items, MENUITEM_BUFFER_SIZE);
 
@@ -221,6 +228,9 @@ static void channelgroups_list_received(DictionaryIterator *iter, void *context)
             .align = ActionMenuAlignCenter
     };
 
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
+    app_message_register_inbox_received(s_main_msg_callback);
+    
     // Show the ActionMenu
     s_action_menu = action_menu_open(&config);  
 }    
