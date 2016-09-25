@@ -23,10 +23,10 @@ static ActionMenuLevel *s_root_level;
 AppMessageInboxReceived s_main_msg_callback;
 
 static uint32_t s_channelgroupids[32];
-static uint32_t s_channelids[32];
+static uint32_t s_channelids[50];
 
 static char *s_channelgroups_titles;
-//static char *s_channels_titles;
+static char *s_channels_titles;
 
 
 static char s_appglance[256];
@@ -228,8 +228,8 @@ static void channelgroups_list_received(DictionaryIterator *iter, void *context)
             .align = ActionMenuAlignCenter
     };
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
-    app_message_register_inbox_received(s_main_msg_callback);
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "restoring main appmessage callback");
+    //app_message_register_inbox_received(s_main_msg_callback);
     
     // Show the ActionMenu
     s_action_menu = action_menu_open(&config);  
