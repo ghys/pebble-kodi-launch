@@ -23,7 +23,7 @@
     <div class='item-container'>
       <div class='item-container-content'>
         <div class='item'>
-          Enter the local IP address and authentication credentials of your Kodi HTPC. Multiple devices are not supported yet.</br>
+          Enter the local IP address and authentication credentials of your Kodi HTPC. Multiple devices are not supported yet.<br/>
           Please also make sure you authorize remote control via HTTP in Kodi options (Services &gt; Web Server).
         </div>
       </div>
@@ -82,8 +82,8 @@
 
     // Save for next launch
     localStorage['kodi_ip'] = options['kodi_ip'];
-    if (username.value) localStorage['kodi_user'] = username.value;
-    if (password.value) localStorage['kodi_password'] = password.value;
+    localStorage['kodi_user'] = username.value;
+    localStorage['kodi_password'] = password.value;
 
     //console.log('Got options: ' + JSON.stringify(options));
     return options;
