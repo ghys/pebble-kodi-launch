@@ -45,6 +45,13 @@
         "resources": {
             "media": [
                 {
+                    "file": "images/logo25.png",
+                    "menuIcon": true,
+                    "name": "APP_LOGO",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
                     "file": "images/volume-up.png",
                     "name": "ICON_VOLUME_UP",
                     "targetPlatforms": null,
@@ -163,5 +170,5 @@
             "watchface": false
         }
     },
-    "version": "1.1.0"
+    "version": "1.2.0"
 }
