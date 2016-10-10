@@ -45,39 +45,6 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/navigation.png",
-                    "name": "ICON_NAVIGATION",
-                    "targetPlatforms": [
-                        "aplite",
-                        "basalt",
-                        "chalk",
-                        "diorite"
-                    ],
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/movie.png",
-                    "name": "ICON_MOVIE",
-                    "targetPlatforms": [
-                        "aplite",
-                        "basalt",
-                        "chalk",
-                        "diorite"
-                    ],
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/tv.png",
-                    "name": "ICON_TV",
-                    "targetPlatforms": [
-                        "aplite",
-                        "basalt",
-                        "chalk",
-                        "diorite"
-                    ],
-                    "type": "bitmap"
-                },
-                {
                     "file": "images/volume-up.png",
                     "name": "ICON_VOLUME_UP",
                     "targetPlatforms": null,
@@ -93,6 +60,17 @@
                     "file": "images/volume-down.png",
                     "name": "ICON_VOLUME_DOWN",
                     "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/tv.png",
+                    "name": "ICON_TV",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
                     "type": "bitmap"
                 },
                 {
@@ -117,6 +95,28 @@
                     "file": "images/pause.png",
                     "name": "ICON_PAUSE",
                     "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/navigation.png",
+                    "name": "ICON_NAVIGATION",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/movie.png",
+                    "name": "ICON_MOVIE",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
                     "type": "bitmap"
                 },
                 {

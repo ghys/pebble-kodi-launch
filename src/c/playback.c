@@ -83,8 +83,8 @@ static void stop() {
 }
 
 void click_config_provider(void *context) {
-  window_single_click_subscribe(BUTTON_ID_DOWN, skip_rev);
-  window_single_click_subscribe(BUTTON_ID_UP, skip_fwd);
+  window_single_click_subscribe(BUTTON_ID_UP, skip_rev);
+  window_single_click_subscribe(BUTTON_ID_DOWN, skip_fwd);
   window_single_click_subscribe(BUTTON_ID_SELECT, play_pause);
   window_long_click_subscribe(BUTTON_ID_UP, 0, goto_prev, NULL);
   window_long_click_subscribe(BUTTON_ID_DOWN, 0, goto_next, NULL);
